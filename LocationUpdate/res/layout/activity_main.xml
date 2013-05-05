@@ -25,14 +25,14 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:text="START"/>
+            android:text="PREVIOUS"/>
         
         <Button 
             android:id="@+id/stop"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:text="STOP"/>
+            android:text="NEXT"/>
         
     </LinearLayout>
 </RelativeLayout>

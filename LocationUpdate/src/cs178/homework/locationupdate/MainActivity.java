@@ -39,11 +39,13 @@ public class MainActivity extends Activity implements LocationListener{
 	private GoogleMap map;
 	private String provider;
 	private Marker position;
-	private Polyline line;
 	private Button start, stop;
 	//private double prevlat, prevlon;
 	private LocationManager locationManager;
 	final LatLng MAIN = new LatLng(10.30046, 123.88822);
+	private LatLng[] paths;
+	private int index = -1, curIdx;
+	private boolean isClicked = false;
 	
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -55,14 +57,14 @@ public class MainActivity extends Activity implements LocationListener{
 		stop = (Button) findViewById(R.id.stop);
 		
 		if(map != null)
-		{
-			Marker main = map.addMarker(new MarkerOptions().position(MAIN));
-			
+		{	
+			paths = new LatLng[10];
 			locationManager = (LocationManager) getSystemService(LOCATION_SERVICE);
 
 			Criteria criteria = new Criteria();
 			provider = locationManager.getBestProvider(criteria, false);	//uses gps as default
 			
+			locationManager.requestLocationUpdates(provider, 1000, 10, MainActivity.this);
 			
 			start.setOnClickListener(new OnClickListener() {
 					
@@ -76,7 +78,17 @@ public class MainActivity extends Activity implements LocationListener{
 						prevlon = location.getLongitude();
 					}*/
 					
-					locationManager.requestLocationUpdates(provider, 1000, 10, MainActivity.this);
+					//locationManager.requestLocationUpdates(provider, 1000, 10, MainActivity.this);
+					
+					if(curIdx > 0)
+					{
+						isClicked = true;
+						curIdx--;
+						Location location = new Location("");
+						location.setLatitude(paths[curIdx].latitude);
+						location.setLongitude(paths[curIdx].longitude);
+						onLocationChanged(location);
+					}
 				}
 			});
 			
@@ -85,14 +97,24 @@ public class MainActivity extends Activity implements LocationListener{
 					
 				@Override
 				public void onClick(View v) {
-					locationManager.removeUpdates(MainActivity.this);
+					/*locationManager.removeUpdates(MainActivity.this);
 					Location location = locationManager.getLastKnownLocation(provider);
 					
 					if(location != null)							
 						Toast.makeText(MainActivity.this, "Latitude: " + location.getLatitude() + ", Longitude: " + location.getLongitude(), Toast.LENGTH_LONG).show();
 						
 					else
-						Toast.makeText(MainActivity.this, "Location not available", Toast.LENGTH_LONG).show();	
+						Toast.makeText(MainActivity.this, "Location not available", Toast.LENGTH_LONG).show();*/
+					
+					if(index < paths.length - 1)
+					{
+						isClicked = true;
+						curIdx++;
+						Location location = new Location("");
+						location.setLatitude(paths[curIdx].latitude);
+						location.setLongitude(paths[curIdx].longitude);
+						onLocationChanged(location);
+					}
 				}
 			});
 		}		
@@ -107,15 +129,22 @@ public class MainActivity extends Activity implements LocationListener{
 	
 	@Override
 	public void onLocationChanged(Location location) {
-		if(position != null)
-			position.remove();
-
-		if(line !=null)
-			line.remove();
-		
 		double curlat = location.getLatitude(), curlon = location.getLongitude();
 		LatLng pos = new LatLng(curlat, curlon);
 		
+		if(isClicked == false)
+		{
+			index++;
+			paths[index] = pos;
+			curIdx = index;
+		}
+		
+		else
+			isClicked = false;
+			
+		if(position != null)
+			map.clear();
+			
 		if(pos == MAIN)
 		{
 			map.animateCamera(CameraUpdateFactory.newLatLngZoom(MAIN, 16), 2000, null);
@@ -124,6 +153,7 @@ public class MainActivity extends Activity implements LocationListener{
 		
 		else
 		{
+			Marker main = map.addMarker(new MarkerOptions().position(MAIN));
 			position = map.addMarker(new MarkerOptions().position(pos));
 			map.animateCamera(CameraUpdateFactory.newLatLngZoom(pos, 16), 2000, null);
 		
@@ -185,10 +215,10 @@ public class MainActivity extends Activity implements LocationListener{
 			{
 				LatLng src = list.get(i);
 				LatLng dest = list.get(i+1);
-				line = map.addPolyline(new PolylineOptions().add(new LatLng(src.latitude, src.longitude), new LatLng(dest.latitude, dest.longitude))
+				Polyline line = map.addPolyline(new PolylineOptions().add(new LatLng(src.latitude, src.longitude), new LatLng(dest.latitude, dest.longitude))
 				.width(2).color(Color.RED).geodesic(true));
-				
 			}
+			
 		} catch (JSONException e) {
 
 	    }
@@ -240,7 +270,7 @@ public class MainActivity extends Activity implements LocationListener{
 		protected void onPreExecute() {
 			super.onPreExecute();
 			progress = new ProgressDialog(MainActivity.this);
-			progress.setMessage("Tracing path between markers! Please wait...");
+			progress.setMessage("Tracing route between markers, please wait...");
 			progress.show();
 		}
 		
