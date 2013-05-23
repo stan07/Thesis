@@ -21,18 +21,26 @@
         <!--  android:layout_alignParentBottom="true"--> 
         
         <Button 
-            android:id="@+id/start"
+            android:id="@+id/prev"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:text="START"/>
+            android:text="PREVIOUS"/>
         
         <Button 
-            android:id="@+id/stop"
+            android:id="@+id/next"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:text="STOP"/>
-        
+            android:text="NEXT"/>       
     </LinearLayout>
+    
+     <Button 
+            android:id="@+id/send"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentBottom="true"
+            android:width="150dp"
+            android:text="SEND"/>
+     
 </RelativeLayout>
