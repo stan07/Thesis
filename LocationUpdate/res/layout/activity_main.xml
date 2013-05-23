@@ -32,7 +32,12 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_weight="1"
+<<<<<<< HEAD
             android:text="NEXT"/>       
+=======
+            android:text="NEXT"/>
+        
+>>>>>>> parent of aa728f1... Test Project Committed 3
     </LinearLayout>
     
      <Button 

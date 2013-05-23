@@ -42,14 +42,23 @@ public class MainActivity extends Activity implements LocationListener{
 	/*private static String SENT = "SMS_SENT";
     private static String DELIVERED = "SMS_DELIVERED";*/
 	private Marker position;
+<<<<<<< HEAD
 	private Button prev, next, send;
+=======
+	private Button start, stop;
+>>>>>>> parent of aa728f1... Test Project Committed 3
 	//private double prevlat, prevlon;
 	private LocationManager locationManager;
 	final LatLng MAIN = new LatLng(10.30046, 123.88822);
 	private LatLng[] paths;
+<<<<<<< HEAD
 	private int lastDataIndex = -1, curIdx;
 	private boolean isClicked = false;
 	
+=======
+	private int index = -1, curIdx;
+	private boolean isClicked = false;
+>>>>>>> parent of aa728f1... Test Project Committed 3
 	
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -63,7 +72,10 @@ public class MainActivity extends Activity implements LocationListener{
 		
 		if(map != null)
 		{	
+<<<<<<< HEAD
 			
+=======
+>>>>>>> parent of aa728f1... Test Project Committed 3
 			paths = new LatLng[10];
 			locationManager = (LocationManager) getSystemService(LOCATION_SERVICE);
 
@@ -71,9 +83,12 @@ public class MainActivity extends Activity implements LocationListener{
 			provider = locationManager.getBestProvider(criteria, false);	//uses gps as default
 			
 			locationManager.requestLocationUpdates(provider, 1000, 10, MainActivity.this);
+<<<<<<< HEAD
 			
 			if(getIntent().hasExtra("sms_location"))
 				getCoordinates();
+=======
+>>>>>>> parent of aa728f1... Test Project Committed 3
 			
 			prev.setOnClickListener(new OnClickListener() {
 					
@@ -115,7 +130,11 @@ public class MainActivity extends Activity implements LocationListener{
 					else
 						Toast.makeText(MainActivity.this, "Location not available", Toast.LENGTH_LONG).show();*/
 					
+<<<<<<< HEAD
 					if(lastDataIndex < paths.length - 1)
+=======
+					if(index < paths.length - 1)
+>>>>>>> parent of aa728f1... Test Project Committed 3
 					{
 						isClicked = true;
 						curIdx++;
@@ -124,6 +143,7 @@ public class MainActivity extends Activity implements LocationListener{
 						location.setLongitude(paths[curIdx].longitude);
 						onLocationChanged(location);
 					}
+<<<<<<< HEAD
 				}
 			});
 			
@@ -144,6 +164,8 @@ public class MainActivity extends Activity implements LocationListener{
 					smsIntent.putExtra("sms_location", location);
 					smsIntent.setType("vnd.android-dir/mms-sms");
 					startActivity(smsIntent);*/
+=======
+>>>>>>> parent of aa728f1... Test Project Committed 3
 				}
 			});
 		}		
@@ -182,9 +204,15 @@ public class MainActivity extends Activity implements LocationListener{
 		
 		if(isClicked == false)
 		{
+<<<<<<< HEAD
 			lastDataIndex++;
 			paths[lastDataIndex] = mCurrPos;
 			curIdx = lastDataIndex;
+=======
+			index++;
+			paths[index] = pos;
+			curIdx = index;
+>>>>>>> parent of aa728f1... Test Project Committed 3
 		}
 		
 		else
@@ -193,7 +221,11 @@ public class MainActivity extends Activity implements LocationListener{
 		if(position != null)
 			map.clear();
 			
+<<<<<<< HEAD
 		if(mCurrPos == MAIN)
+=======
+		if(pos == MAIN)
+>>>>>>> parent of aa728f1... Test Project Committed 3
 		{
 			map.animateCamera(CameraUpdateFactory.newLatLngZoom(MAIN, 16), 2000, null);
 			Toast.makeText(MainActivity.this, "You have reached your final destination!", Toast.LENGTH_LONG).show();
@@ -202,8 +234,13 @@ public class MainActivity extends Activity implements LocationListener{
 		else
 		{
 			Marker main = map.addMarker(new MarkerOptions().position(MAIN));
+<<<<<<< HEAD
 			position = map.addMarker(new MarkerOptions().position(mCurrPos));
 			map.animateCamera(CameraUpdateFactory.newLatLngZoom(mCurrPos, 16), 2000, null);
+=======
+			position = map.addMarker(new MarkerOptions().position(pos));
+			map.animateCamera(CameraUpdateFactory.newLatLngZoom(pos, 16), 2000, null);
+>>>>>>> parent of aa728f1... Test Project Committed 3
 		
 			//makes a string to be converted as a JSON object for drawing paths on the map between markers
 			String url = makeJsonCompatibleUrlStr(curlat, curlon, MAIN.latitude, MAIN.longitude); 
@@ -321,10 +358,28 @@ public class MainActivity extends Activity implements LocationListener{
 	    return poly;
 	}
 	
+<<<<<<< HEAD
 	@Override
 	public void onProviderDisabled(String provider) {
 		Toast.makeText(this, "Disabled provider " + provider,
 		        Toast.LENGTH_SHORT).show();
+=======
+	private class ConnectAsyncTask extends AsyncTask<Void, Void, String> {
+		
+		private ProgressDialog progress;
+		String url;
+		
+		public ConnectAsyncTask(String url){
+			this.url = url;
+		}
+		
+		protected void onPreExecute() {
+			super.onPreExecute();
+			progress = new ProgressDialog(MainActivity.this);
+			progress.setMessage("Tracing route between markers, please wait...");
+			progress.show();
+		}
+>>>>>>> parent of aa728f1... Test Project Committed 3
 		
 	}
 
