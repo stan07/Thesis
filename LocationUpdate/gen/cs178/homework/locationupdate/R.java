@@ -142,8 +142,10 @@ containing a value of this type.
         public static final int ic_launcher=0x7f020000;
     }
     public static final class id {
-        public static final int action_settings=0x7f04000d;
-        public static final int connect=0x7f04000b;
+        public static final int action_settings=0x7f040010;
+        public static final int clientback=0x7f04000c;
+        public static final int connect=0x7f040009;
+        public static final int disconnect=0x7f04000e;
         public static final int hybrid=0x7f040004;
         public static final int linear=0x7f040006;
         public static final int map=0x7f040005;
@@ -152,9 +154,10 @@ containing a value of this type.
         public static final int normal=0x7f040001;
         public static final int prev=0x7f040007;
         public static final int satellite=0x7f040002;
-        public static final int send=0x7f040009;
-        public static final int server_ip=0x7f04000a;
-        public static final int status=0x7f04000c;
+        public static final int send=0x7f04000a;
+        public static final int server_ip=0x7f04000b;
+        public static final int serverback=0x7f04000f;
+        public static final int status=0x7f04000d;
         public static final int terrain=0x7f040003;
     }
     public static final class layout {

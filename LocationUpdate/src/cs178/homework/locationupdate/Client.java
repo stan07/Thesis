@@ -17,7 +17,7 @@ import android.widget.EditText;
 public class Client extends Activity{
 	
 	private EditText serverIp;
-	private Button connect;
+	private Button connect, back;
 	private String serverIpAddress = "";
 	private boolean connected = false;
 	
@@ -27,8 +27,8 @@ public class Client extends Activity{
 		setContentView(R.layout.client);
 		
 		serverIp = (EditText) findViewById(R.id.server_ip);
-		
 		connect = (Button) findViewById(R.id.connect);
+		back = (Button) findViewById(R.id.clientback);
 		
 		connect.setOnClickListener(new OnClickListener() {
 			
@@ -45,6 +45,15 @@ public class Client extends Activity{
 					}
 				}
 				
+			}
+		});
+		
+		
+		back.setOnClickListener(new OnClickListener() {
+			
+			@Override
+			public void onClick(View v) {
+				Client.this.finish();				
 			}
 		});
 	}
@@ -67,12 +76,13 @@ public class Client extends Activity{
 						PrintWriter out = new PrintWriter(new BufferedWriter(new OutputStreamWriter(socket.getOutputStream())), true);
 						
 						//WHERE YOU ISSUE THE COMMANDS
-						out.println("HEY SERVER!");
+						out.println("FUCK YOU SERVER!");
+						out.write("FUCK YOU SERVER!");
 						
 						Log.d("Client Activity", "Sent!");
 					
 					} catch(Exception e) {
-						Log.e("Client Activity", "Error!", e);
+						Log.e("Client Activity", "Sending Command Error!", e);
 					}
 				}
 				socket.close();

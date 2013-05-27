@@ -12,7 +12,7 @@
         android:text="Server Status:"
         android:textColor="#ffffff"
         android:textSize="15dp"
-        android:layout_marginRight="90dp"/>
+        android:layout_marginRight="80dp"/>
     
     <TextView 
         android:id="@+id/status"
@@ -22,7 +22,38 @@
         android:textColor="#ffffff"
         android:textStyle="bold"
         android:textSize="20dp"
-        android:layout_marginTop="20dp"/>
+        android:layout_marginTop="30dp"/>
     
-
+    <LinearLayout
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="30dp"
+        android:gravity="center_horizontal">
+    	
+    	<Button
+    	    android:id="@+id/connect" 
+    	    android:layout_width="wrap_content"
+    		android:layout_height="wrap_content"
+    		android:text="Connect"
+    		android:width="150dp"
+    		android:textColor="#ffffff"/>
+    	
+    	<Button
+    	    android:id="@+id/disconnect" 
+    	    android:layout_width="wrap_content"
+    		android:layout_height="wrap_content"
+    		android:text="Disconnect"
+    		android:width="150dp"
+    		android:textColor="#ffffff"/>
+   	</LinearLayout>
+   	
+    <Button
+   		android:id="@+id/serverback" 
+    	android:layout_width="wrap_content"
+    	android:layout_height="wrap_content"
+    	android:text="Back"
+    	android:width="150dp"
+    	android:textColor="#ffffff"
+    	android:layout_marginTop="15dp"/>
+    
 </LinearLayout>
