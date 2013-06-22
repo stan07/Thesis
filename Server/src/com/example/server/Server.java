@@ -10,7 +10,6 @@ public class Server implements Runnable{
 	
 	public ServerSocket serverSocket;
 	
-	private static Socket clientSocket;
 	private static String clientCoordinates = "", taxiCoordinates = "";
 		
 	@Override
@@ -29,8 +28,8 @@ public class Server implements Runnable{
 		while(Constants.isThreadRunning)
 		{
 			try {
-				clientSocket = serverSocket.accept();
-				new Thread(new ServerThread()).start();
+				Socket socket = serverSocket.accept();
+				new Thread(new ServerThread(socket)).start();
 			} catch (IOException e) {
 				
 			}
@@ -39,6 +38,12 @@ public class Server implements Runnable{
 	}
 	
 	private class ServerThread implements Runnable {
+		
+		private Socket clientSocket;
+		
+		public ServerThread(Socket clientSocket) {
+			this.clientSocket = clientSocket;
+		}
 		
 		@Override
 		public void run() {
