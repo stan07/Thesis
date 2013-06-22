@@ -8,4 +8,6 @@ public class Constants {
 		CLIENTID = 3,
 		PORT = 8888;
 	
+	public static boolean isThreadRunning = false;
+	
 }

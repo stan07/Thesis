@@ -8,16 +8,13 @@ import java.net.Socket;
 
 public class Server implements Runnable{
 	
-	private Socket clientSocket;
-	private static String clientCoordinates = "", taxiCoordinates = "";
+	public ServerSocket serverSocket;
 	
-	public Server(Socket clientSocket) {
-		this.clientSocket = clientSocket;
-	}
+	private static Socket clientSocket;
+	private static String clientCoordinates = "", taxiCoordinates = "";
 		
-	public static void main(String[] args){
-
-		ServerSocket serverSocket = null;
+	@Override
+	public void run() {
 
 		//attempt to create a new server for data transfers
 		try {
@@ -29,108 +26,111 @@ public class Server implements Runnable{
 		}
 	  
 		//process continues if the server has been established then generate a server-client connection
-		while(true)
+		while(Constants.isThreadRunning)
 		{
 			try {
-				Socket socket = serverSocket.accept();
-				new Thread(new Server(socket)).start();
+				clientSocket = serverSocket.accept();
+				new Thread(new ServerThread()).start();
 			} catch (IOException e) {
-				System.out.println("Failed to connect to client...");
-				e.printStackTrace();
+				
 			}
 		}
+		System.out.println("SERVER IS STOPPED!");
 	}
 	
-	@Override
-	public void run() {
+	private class ServerThread implements Runnable {
 		
-		int ID = 0;
-		DataInputStream input = null;
-		DataOutputStream output = null;
+		@Override
+		public void run() {
 		
-		try 
-		{
-			String clientIP = clientSocket.getInetAddress().toString();
-			System.out.println("Connected to client: " + clientIP);
+			int ID = 0;
+			DataInputStream input = null;
+			DataOutputStream output = null;
 			
-			input = new DataInputStream(clientSocket.getInputStream());
-			output = new DataOutputStream(clientSocket.getOutputStream());
-
-			try{
-				ID = Integer.parseInt(input.readUTF());
-				System.out.println("ID: " + ID);
-			} catch(NumberFormatException e) {
-				output.writeUTF("ID not found!");
-				e.printStackTrace();
-			}
-		
-			if(ID == Constants.SERVERID)
+			try 
 			{
-				output.writeUTF(taxiCoordinates);
-				String serverMsg = input.readUTF();
-				System.out.println("Server Message: " + serverMsg);
-			}
-			
-			else if(ID == Constants.TAXIID)
-			{	
-				String taxiAction = input.readUTF();
+				String clientIP = clientSocket.getInetAddress().toString();
+				System.out.println("Connected to client: " + clientIP);
 				
-				if(taxiAction.equals("LISTEN"))
+				input = new DataInputStream(clientSocket.getInputStream());
+				output = new DataOutputStream(clientSocket.getOutputStream());
+	
+				try{
+					ID = Integer.parseInt(input.readUTF());
+					System.out.println("ID: " + ID);
+				} catch(NumberFormatException e) {
+					output.writeUTF("ID not found!");
+					e.printStackTrace();
+				}
+			
+				if(ID == Constants.SERVERID)
+				{
+					output.writeUTF(taxiCoordinates);
+					String serverMsg = input.readUTF();
+					System.out.println("Server Message: " + serverMsg);
+				}
+				
+				else if(ID == Constants.TAXIID)
 				{	
-					if(!clientCoordinates.equals(""))
-					{
-						output.writeUTF(clientCoordinates);
-						clientCoordinates = "";
-					}	
+					String taxiAction = input.readUTF();
+					
+					if(taxiAction.equals("LISTEN"))
+					{	
+						if(!clientCoordinates.equals(""))
+						{
+							output.writeUTF(clientCoordinates);
+							clientCoordinates = "";
+						}	
+						
+						else
+							output.writeUTF("NULL");
+					}
 					
 					else
-						output.writeUTF("NULL");
+					{
+						taxiCoordinates = input.readUTF();
+						System.out.println("Taxi Coordinates: " + taxiCoordinates);
+					}
 				}
 				
 				else
 				{
-					taxiCoordinates = input.readUTF();
-					System.out.println("Taxi Coordinates: " + taxiCoordinates);
+					clientCoordinates = input.readUTF();
+					System.out.println("Client Coordinates: " + clientCoordinates);
+					output.writeUTF("Coordinates received by server!");
 				}
+				
+			} catch (IOException e) {
+				e.printStackTrace();
 			}
-			
-			else
+		
+			finally
 			{
-				clientCoordinates = input.readUTF();
-				System.out.println("Client Coordinates: " + clientCoordinates);
-				output.writeUTF("Coordinates received by server!");
-			}
-			
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
-	
-		finally
-		{
-			if(clientSocket!= null)
-			{
-				try {
-					clientSocket.close();
-				} catch (IOException e) {
-					e.printStackTrace();
+				if(clientSocket!= null)
+				{
+					try {
+						clientSocket.close();
+					} catch (IOException e) {
+						e.printStackTrace();
+					}
 				}
-			}
-			
-			if(input!= null)
-			{
-				try {
-					input.close();
-				} catch (IOException e) {
-					e.printStackTrace();
-				}	
-			}
-			
-			if(output!= null)
-			{
-				try {
-					output.close();
-				} catch (IOException e) {
-					e.printStackTrace();
+				
+				if(input!= null)
+				{
+					try {
+						input.close();
+					} catch (IOException e) {
+						e.printStackTrace();
+					}	
+				}
+				
+				if(output!= null)
+				{
+					try {
+						output.close();
+					} catch (IOException e) {
+						e.printStackTrace();
+					}
 				}
 			}
 		}
