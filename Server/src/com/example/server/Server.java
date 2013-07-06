@@ -5,6 +5,7 @@ import java.io.DataOutputStream;
 import java.io.IOException;
 import java.net.ServerSocket;
 import java.net.Socket;
+import java.sql.SQLException;
 
 public class Server implements Runnable{
 	
@@ -54,9 +55,6 @@ public class Server implements Runnable{
 			
 			try 
 			{
-				String clientIP = clientSocket.getInetAddress().toString();
-				System.out.println("Connected to client: " + clientIP);
-				
 				input = new DataInputStream(clientSocket.getInputStream());
 				output = new DataOutputStream(clientSocket.getOutputStream());
 	
@@ -93,19 +91,31 @@ public class Server implements Runnable{
 					
 					else
 					{
-						taxiCoordinates = input.readUTF();
+						String taxiCoordinates = input.readUTF();
 						System.out.println("Taxi Coordinates: " + taxiCoordinates);
 					}
 				}
 				
 				else
 				{
-					clientCoordinates = input.readUTF();
-					System.out.println("Client Coordinates: " + clientCoordinates);
+					String clientMsg = input.readUTF();
+					System.out.println("Client Message: " + clientMsg);
+					String[] clientCoordinates = clientMsg.split(",");
+					
+					ClientStruct client = new ClientStruct();
+					client.clientIP = clientSocket.getInetAddress().toString();
+					client.srcLatitude = Double.parseDouble(clientCoordinates[0]);
+					client.srcLongitude = Double.parseDouble(clientCoordinates[1]);
+					client.destLatitude = Double.parseDouble(clientCoordinates[2]);
+					client.destLongitude = Double.parseDouble(clientCoordinates[3]);
+					
+					Constants.database.insertClientValues(client);
 					output.writeUTF("Coordinates received by server!");
 				}
 				
 			} catch (IOException e) {
+				e.printStackTrace();
+			} catch (SQLException e) {
 				e.printStackTrace();
 			}
 		

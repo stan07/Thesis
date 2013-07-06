@@ -1,23 +1,28 @@
 package com.example.server;
 
 import java.awt.BorderLayout;
+import java.awt.Dimension;
 import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.io.IOException;
+import java.sql.SQLException;
 
 import javax.swing.JButton;
 import javax.swing.JFrame;
+import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
+import javax.swing.JTextField;
 
 @SuppressWarnings("serial")
 public class ServerUI extends JFrame{
 	
 	private Server server;
-	private JButton startButton, stopButton;
+	private JButton startButton, stopButton, displayButton, displayAllButton;
+	JTextField plateNoField, bodyNoField; 
 	
 	public ServerUI() {
 		createServerGUI();
@@ -38,7 +43,19 @@ public class ServerUI extends JFrame{
 			}
 		});
 		
-		JPanel mapPanel = new JPanel(new BorderLayout());
+		JLabel plateNoLabel = new JLabel("Plate No:");
+		plateNoField = new JTextField();
+		plateNoField.setPreferredSize(new Dimension(100, 20));
+		
+		JLabel bodyNoLabel = new JLabel("Body No:");
+		bodyNoField = new JTextField();
+		bodyNoField.setPreferredSize(new Dimension(100, 20));
+		
+		JPanel mapPanel = new JPanel();
+		mapPanel.add(plateNoLabel);
+		mapPanel.add(plateNoField);
+		mapPanel.add(bodyNoLabel);
+		mapPanel.add(bodyNoField);
 		
 		startButton = new JButton("START");
 		startButton.addActionListener(new ButtonListener());
@@ -46,16 +63,20 @@ public class ServerUI extends JFrame{
 		stopButton = new JButton("STOP");
 		stopButton.addActionListener(new ButtonListener());
 		
-		JButton optionsButton = new JButton("OPTIONS");
-		JButton taxiButton = new JButton("FIND TAXI");
+		displayButton = new JButton("DISPLAY TAXI");
+		displayButton.addActionListener(new ButtonListener());
+		
+		displayAllButton = new JButton("DISPLAY ALL TAXI");
+		displayAllButton.addActionListener(new ButtonListener());
+		
 		JButton locateButton = new JButton("LOCATE TAXI");
 		JButton exitButton = new JButton("EXIT");
 		
 		JPanel ctrlPanel = new JPanel(new GridLayout(2, 3, 2, 2));
 		ctrlPanel.add(startButton);
 		ctrlPanel.add(stopButton);
-		ctrlPanel.add(optionsButton);
-		ctrlPanel.add(taxiButton);
+		ctrlPanel.add(displayButton);
+		ctrlPanel.add(displayAllButton);
 		ctrlPanel.add(locateButton);
 		ctrlPanel.add(exitButton);
 		
@@ -86,6 +107,7 @@ public class ServerUI extends JFrame{
 			if(e.getSource() == startButton)
 			{
 				Constants.isThreadRunning = true;
+				Constants.database = new Database();
 				server = new Server();
 				new Thread(server).start();
 			}
@@ -98,6 +120,30 @@ public class ServerUI extends JFrame{
 					try {
 						server.serverSocket.close();
 					} catch (IOException e1) {
+						e1.printStackTrace();
+					}
+				}
+			}
+			
+			else if(e.getSource() == displayButton)
+			{
+				String plateNo = plateNoField.getText(), bodyNo = bodyNoField.getText();
+				
+				if(!plateNo.equals("") || !bodyNo.equals(""))
+					try {
+						Constants.database.displayTaxi(plateNo, bodyNo);
+					} catch (SQLException e1) {
+						e1.printStackTrace();
+					}
+			}
+			
+			else if(e.getSource() == displayAllButton)
+			{
+				if(Constants.database != null)
+				{
+					try {
+						Constants.database.displayAllTaxi();
+					} catch (SQLException e1) {
 						e1.printStackTrace();
 					}
 				}

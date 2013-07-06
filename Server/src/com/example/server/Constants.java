@@ -9,5 +9,6 @@ public class Constants {
 		PORT = 8888;
 	
 	public static boolean isThreadRunning = false;
+	public static Database database = null;
 	
 }
