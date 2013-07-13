@@ -142,19 +142,25 @@ containing a value of this type.
         public static final int ic_launcher=0x7f020000;
     }
     public static final class id {
-        public static final int action_settings=0x7f040009;
+        public static final int action_settings=0x7f04000e;
+        public static final int connect=0x7f040008;
+        public static final int disconnect=0x7f04000d;
+        public static final int failed=0x7f040005;
         public static final int hybrid=0x7f040004;
-        public static final int linear=0x7f040006;
-        public static final int map=0x7f040005;
+        public static final int license=0x7f040007;
+        public static final int linear=0x7f04000a;
+        public static final int map=0x7f040009;
         public static final int none=0x7f040000;
         public static final int normal=0x7f040001;
-        public static final int occupied=0x7f040008;
+        public static final int occupied=0x7f04000c;
+        public static final int plateno=0x7f040006;
         public static final int satellite=0x7f040002;
         public static final int terrain=0x7f040003;
-        public static final int vacant=0x7f040007;
+        public static final int vacant=0x7f04000b;
     }
     public static final class layout {
-        public static final int taxi_map=0x7f030000;
+        public static final int taxi_login=0x7f030000;
+        public static final int taxi_map=0x7f030001;
     }
     public static final class menu {
         public static final int taxi=0x7f080000;

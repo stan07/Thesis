@@ -85,7 +85,8 @@ public class ClientMap extends FragmentActivity implements LocationListener{
 
 	@Override
 	public void onLocationChanged(Location location) {
-		curLatLng = new LatLng(location.getLatitude(), location.getLongitude());		
+		curLatLng = new LatLng(location.getLatitude(), location.getLongitude());
+		map.animateCamera(CameraUpdateFactory.newLatLngZoom(curLatLng, 16), 2000, null);
 		setMarkers();
 	}
 
@@ -114,7 +115,6 @@ public class ClientMap extends FragmentActivity implements LocationListener{
 			map.clear();
 			
 		Marker curMarker = map.addMarker(new MarkerOptions().position(curLatLng).title("Current Location"));
-		map.animateCamera(CameraUpdateFactory.newLatLngZoom(curLatLng, 16), 2000, null);
 		
 		if(isMapClicked)
 		{

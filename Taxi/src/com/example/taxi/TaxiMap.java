@@ -1,5 +1,7 @@
 package com.example.taxi;
 
+import java.io.IOException;
+
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.SupportMapFragment;
@@ -26,8 +28,9 @@ public class TaxiMap extends FragmentActivity implements LocationListener{
 	public static Polyline line;
 	
 	private String provider;
-	private Button vacant, occupied;
+	private Button vacant, occupied, disconnect;
 	private LocationManager locationManager;
+	
 	private static Context context;
 	
 	@Override
@@ -46,7 +49,8 @@ public class TaxiMap extends FragmentActivity implements LocationListener{
 					TaxiConstants.isVacant = true;
 					TaxiConstants.hasClient = false;
 					setMarkers();
-					new ListenServerAsyncTask().execute();
+					new SendServerAsyncTask().execute(TaxiConstants.TAXI_STATUS_ID);
+					new Thread(new ServerListener()).start();
 				}
 				
 				else
@@ -62,12 +66,27 @@ public class TaxiMap extends FragmentActivity implements LocationListener{
 				if(TaxiConstants.isVacant)
 				{
 					TaxiConstants.isVacant = false;
-					TaxiConstants.hasClient = true;
 					setMarkers();
 				}
 				
 				else
 					Toast.makeText(TaxiMap.this, "Taxi is already occupied", Toast.LENGTH_SHORT).show();
+			}
+		});
+		
+		disconnect = (Button) findViewById(R.id.disconnect);
+		disconnect.setOnClickListener(new OnClickListener() {
+			
+			@Override
+			public void onClick(View v) {
+				try {
+					if(ServerListener.taxiSocket != null)
+						ServerListener.taxiSocket.close();
+				} catch (IOException e) {
+					e.printStackTrace();
+				}
+
+				TaxiMap.this.finish();
 			}
 		});
 		
@@ -82,10 +101,11 @@ public class TaxiMap extends FragmentActivity implements LocationListener{
 			criteria.setPowerRequirement(Criteria.POWER_LOW);
 			provider = locationManager.getBestProvider(criteria, true);
 			
-			locationManager.requestLocationUpdates(provider, 300000, 500, TaxiMap.this);
+			locationManager.requestLocationUpdates(provider, 30000, 500, TaxiMap.this);
 		}
 		
-		new ListenServerAsyncTask().execute();
+		new SendServerAsyncTask().execute(TaxiConstants.TAXI_STATUS_ID);
+		new Thread(new ServerListener()).start();
 	}
 	
 	@Override
@@ -137,8 +157,7 @@ public class TaxiMap extends FragmentActivity implements LocationListener{
 			
 			new DrawPathAsyncTask(context, url).execute();
 		}
-		
-		new SendServerAsyncTask().execute();
+		new SendServerAsyncTask().execute(TaxiConstants.TAXI_COORDINATES_ID);
 	}
 	
 	private static String makeJsonCompatibleUrlStr(double srclatt, double srclong, double destlatt, double destlong) {

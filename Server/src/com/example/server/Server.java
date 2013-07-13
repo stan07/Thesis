@@ -9,19 +9,17 @@ import java.sql.SQLException;
 
 public class Server implements Runnable{
 	
-	public ServerSocket serverSocket;
-	
-	private static String clientCoordinates = "", taxiCoordinates = "";
+	public static ServerSocket serverSocket;
 		
 	@Override
 	public void run() {
 
 		//attempt to create a new server for data transfers
 		try {
-			serverSocket = new ServerSocket(Constants.PORT);
-			System.out.println("LISTENING TO PORT: " + Constants.PORT);
+			serverSocket = new ServerSocket(Constants.SERVERPORT);
+			System.out.println("LISTENING TO SERVERPORT: " + Constants.SERVERPORT);
 		} catch (IOException e) {
-			System.out.println("FAILED TO LISTEN TO PORT...");
+			System.out.println("FAILED TO LISTEN TO SERVERPORT...");
 			e.printStackTrace();
 		}
 	  
@@ -40,23 +38,24 @@ public class Server implements Runnable{
 	
 	private class ServerThread implements Runnable {
 		
-		private Socket clientSocket;
+		private Socket socket;
 		
-		public ServerThread(Socket clientSocket) {
-			this.clientSocket = clientSocket;
+		public ServerThread(Socket socket) {
+			this.socket = socket;
 		}
 		
 		@Override
 		public void run() {
 		
 			int ID = 0;
+			Socket taxiSocket = null;
 			DataInputStream input = null;
 			DataOutputStream output = null;
 			
 			try 
 			{
-				input = new DataInputStream(clientSocket.getInputStream());
-				output = new DataOutputStream(clientSocket.getOutputStream());
+				input = new DataInputStream(socket.getInputStream());
+				output = new DataOutputStream(socket.getOutputStream());
 	
 				try{
 					ID = Integer.parseInt(input.readUTF());
@@ -65,35 +64,35 @@ public class Server implements Runnable{
 					output.writeUTF("ID not found!");
 					e.printStackTrace();
 				}
-			
-				if(ID == Constants.SERVERID)
+				
+				if(ID == Constants.TAXI_LOGIN_ID)
 				{
-					output.writeUTF(taxiCoordinates);
-					String serverMsg = input.readUTF();
-					System.out.println("Server Message: " + serverMsg);
+					String[] loginData = new String[3]; 
+					loginData[0] = input.readUTF();
+					loginData[1] = input.readUTF();
+					loginData[2] = input.readUTF();
+					
+					int result = Constants.database.loginTaxiData(loginData);
+					output.writeUTF(String.valueOf(result));
 				}
 				
-				else if(ID == Constants.TAXIID)
+				else if(ID == Constants.TAXI_STATUS_ID)
+				{
+					String plateNo = input.readUTF();
+					System.out.println(plateNo);
+					char status = input.readUTF().charAt(0);
+					System.out.println(status);
+					Constants.database.updateTaxiStatus(plateNo, status);
+				}
+				
+				else if(ID == Constants.TAXI_COORDINATES_ID)
 				{	
-					String taxiAction = input.readUTF();
-					
-					if(taxiAction.equals("LISTEN"))
-					{	
-						if(!clientCoordinates.equals(""))
-						{
-							output.writeUTF(clientCoordinates);
-							clientCoordinates = "";
-						}	
-						
-						else
-							output.writeUTF("NULL");
-					}
-					
-					else
-					{
-						String taxiCoordinates = input.readUTF();
-						System.out.println("Taxi Coordinates: " + taxiCoordinates);
-					}
+					String plateNo = input.readUTF();
+					String[] taxiMsg = input.readUTF().split(",");
+					double[] taxiCoordinates = new double[2]; 
+					taxiCoordinates[0] = Double.parseDouble(taxiMsg[0]);
+					taxiCoordinates[1] = Double.parseDouble(taxiMsg[1]);
+					Constants.database.updateTaxiCoordinates(plateNo, taxiCoordinates);
 				}
 				
 				else
@@ -103,14 +102,27 @@ public class Server implements Runnable{
 					String[] clientCoordinates = clientMsg.split(",");
 					
 					ClientStruct client = new ClientStruct();
-					client.clientIP = clientSocket.getInetAddress().toString();
 					client.srcLatitude = Double.parseDouble(clientCoordinates[0]);
 					client.srcLongitude = Double.parseDouble(clientCoordinates[1]);
 					client.destLatitude = Double.parseDouble(clientCoordinates[2]);
 					client.destLongitude = Double.parseDouble(clientCoordinates[3]);
 					
 					Constants.database.insertClientValues(client);
-					output.writeUTF("Coordinates received by server!");
+					TaxiStruct taxi = Constants.database.calculateShortestTaxiDistance(client);
+					output.writeUTF(taxi.plateNo);
+					output.writeUTF(taxi.bodyNo);
+					output.writeUTF(taxi.taxiComp);
+					output.writeUTF(taxi.taxiDesc);
+					output.writeUTF(taxi.driverName);
+					output.writeUTF(taxi.driverNo);
+					
+					taxiSocket = new Socket(taxi.taxiIP, Constants.TAXIPORT);
+					DataOutputStream taxiOutput = new DataOutputStream(taxiSocket.getOutputStream());
+					taxiOutput.writeUTF(clientCoordinates[0]);
+					taxiOutput.writeUTF(clientCoordinates[1]);
+					taxiOutput.writeUTF(clientCoordinates[2]);
+					taxiOutput.writeUTF(clientCoordinates[3]);
+					
 				}
 				
 			} catch (IOException e) {
@@ -118,34 +130,26 @@ public class Server implements Runnable{
 			} catch (SQLException e) {
 				e.printStackTrace();
 			}
-		
 			finally
 			{
-				if(clientSocket!= null)
+				try
 				{
-					try {
-						clientSocket.close();
-					} catch (IOException e) {
-						e.printStackTrace();
-					}
-				}
-				
-				if(input!= null)
-				{
-					try {
+					if(socket != null)
+						socket.close();
+					
+					if(taxiSocket != null)
+						taxiSocket.close();
+
+					if(input != null)
 						input.close();
-					} catch (IOException e) {
-						e.printStackTrace();
-					}	
-				}
-				
-				if(output!= null)
-				{
-					try {
+					
+					if(output != null)
 						output.close();
-					} catch (IOException e) {
-						e.printStackTrace();
-					}
+					
+				} 
+				catch (IOException e) 
+				{
+					e.printStackTrace();
 				}
 			}
 		}

@@ -1,6 +1,5 @@
 package com.example.taxi;
 
-import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
 import java.net.Socket;
@@ -8,40 +7,44 @@ import java.net.UnknownHostException;
 
 import android.os.AsyncTask;
 
-public class SendServerAsyncTask extends AsyncTask<Void, Void, Void>{
-			
-	//DATA COMMUNICATION VARIABLES
+public class SendServerAsyncTask extends AsyncTask<Integer, Void, Void>{
+	
 	private Socket socket;
-	private DataInputStream input;
 	private DataOutputStream output;
-		
+	
 	@Override
-	protected Void doInBackground(Void... params) {
-		sendTaxiCoordinates();
+	protected Void doInBackground(Integer... id) {
+		sendTaxiData(id[0]);
 		return null;
 	}
 		
-	public void sendTaxiCoordinates() {
-		String coordinates = TaxiConstants.curLatLng.latitude + "," + TaxiConstants.curLatLng.longitude;
-		
-		if(TaxiConstants.hasClient)
-		{
-			if(TaxiConstants.isVacant)
-				coordinates += "," + TaxiConstants.clientLatLng.latitude + "," + TaxiConstants.clientLatLng.longitude + ",CLIENT";
-				
-			else
-				coordinates += "," + TaxiConstants.destLatLng.latitude + "," + TaxiConstants.destLatLng.longitude + ",DESTINATION";
-		}
-			
+	public void sendTaxiData(int id) {
 		try
 		{
-			socket = new Socket(TaxiConstants.SERVERIP, TaxiConstants.PORT);
+			socket = new Socket(TaxiConstants.SERVERIP, TaxiConstants.SERVERPORT);
 			output = new DataOutputStream(socket.getOutputStream());
+			
+			if(id == TaxiConstants.TAXI_COORDINATES_ID)
+			{
+				//SEND TAXI COORDINATES TO SERVER
+				String coordinates = TaxiConstants.curLatLng.latitude + "," + TaxiConstants.curLatLng.longitude;
+				output.writeUTF(String.valueOf(TaxiConstants.TAXI_COORDINATES_ID));
+				output.writeUTF(TaxiConstants.plateNo);
+				output.writeUTF(coordinates);
+			}
+			
+			else
+			{
+				//SEND TAXI STATUS TO SERVER
+				output.writeUTF(String.valueOf(TaxiConstants.TAXI_STATUS_ID));
+				output.writeUTF(TaxiConstants.plateNo);
 				
-			//SEND TAXI ID TO SERVER
-			output.writeUTF(String.valueOf(TaxiConstants.TAXIID));
-			output.writeUTF("SEND");
-			output.writeUTF(coordinates);
+				if(TaxiConstants.hasClient)
+					output.writeUTF("O");
+				
+				else
+					output.writeUTF("V");
+			}
 		} 
 		catch (UnknownHostException e) 
 		{
@@ -53,31 +56,18 @@ public class SendServerAsyncTask extends AsyncTask<Void, Void, Void>{
 		}
 		finally
 		{
-			if (socket != null)
+			try
 			{
-				try {
+				if(socket != null)
 					socket.close();
-				} catch (IOException e) {
-					e.printStackTrace();
-				}
-			}
-				
-			if (output != null)
-			{
-				try {
+
+				if(output != null)
 					output.close();
-				} catch (IOException e) {
-					e.printStackTrace();
-				}
-			}
 				
-			if (input != null)
+			} 
+			catch (IOException e) 
 			{
-				try {
-					input.close();
-				} catch (IOException e) {
-					e.printStackTrace();
-				}
+				e.printStackTrace();
 			}
 		}
 	}

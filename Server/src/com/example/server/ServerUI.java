@@ -5,22 +5,18 @@ import java.awt.Dimension;
 import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.awt.event.WindowAdapter;
-import java.awt.event.WindowEvent;
 import java.io.IOException;
 import java.sql.SQLException;
 
 import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
-import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
 
 @SuppressWarnings("serial")
 public class ServerUI extends JFrame{
 	
-	private Server server;
 	private JButton startButton, stopButton, displayButton, displayAllButton;
 	JTextField plateNoField, bodyNoField; 
 	
@@ -33,7 +29,7 @@ public class ServerUI extends JFrame{
 		this.setTitle("Taxi Server");
 		this.setLocationRelativeTo(null);
 		this.setLayout(new BorderLayout());
-		this.setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
+		/*this.setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
 		
 		this.addWindowListener(new WindowAdapter() {
 			public void windowClosing(WindowEvent e) {
@@ -41,7 +37,7 @@ public class ServerUI extends JFrame{
 				if(choice == JOptionPane.YES_OPTION)
 					System.exit(0);
 			}
-		});
+		});*/
 		
 		JLabel plateNoLabel = new JLabel("Plate No:");
 		plateNoField = new JTextField();
@@ -108,8 +104,7 @@ public class ServerUI extends JFrame{
 			{
 				Constants.isThreadRunning = true;
 				Constants.database = new Database();
-				server = new Server();
-				new Thread(server).start();
+				new Thread(new Server()).start();
 			}
 			
 			else if(e.getSource() == stopButton)
@@ -118,8 +113,11 @@ public class ServerUI extends JFrame{
 				{
 					Constants.isThreadRunning = false;
 					try {
-						server.serverSocket.close();
+						Constants.database.clearTaxiData();
+						Server.serverSocket.close();
 					} catch (IOException e1) {
+						e1.printStackTrace();
+					} catch (SQLException e1) {
 						e1.printStackTrace();
 					}
 				}

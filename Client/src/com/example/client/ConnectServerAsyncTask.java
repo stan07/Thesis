@@ -13,16 +13,16 @@ import android.content.Context;
 import android.content.Intent;
 import android.os.AsyncTask;
 
-public class ConnectServerAsyncTask extends AsyncTask<Void, Void, String>{
+public class ConnectServerAsyncTask extends AsyncTask<Void, Void, String[]>{
 	
 	//SERVER IP ADDRESS
-	private final String SERVERIP = "192.168.1.117";
+	private final String SERVERIP = "192.168.1.115";
 		
 	//PORT NUMBER
 	private final int PORT = 8888;
 	
 	//CLIENT ID
-	private final int CLIENTID = 3;
+	private final int CLIENT_ID = 4;
 	
 	//ASYNCTASK VARIABLES
 	private Context context;
@@ -49,11 +49,11 @@ public class ConnectServerAsyncTask extends AsyncTask<Void, Void, String>{
 	}
 	
 	@Override
-	protected String doInBackground(Void... params) {
+	protected String[] doInBackground(Void... params) {
 		return openConnection();
 	}
 	
-	protected void onPostExecute(String result) {
+	protected void onPostExecute(String[] result) {
 		super.onPostExecute(result);
 		progressDialog.hide();
 		Intent intent = new Intent(context, TaxiInfo.class);
@@ -61,8 +61,8 @@ public class ConnectServerAsyncTask extends AsyncTask<Void, Void, String>{
 		context.startActivity(intent);
 	}
 	
-	private String openConnection() {
-		String serverMsg = "";
+	private String[] openConnection() {
+		String[] taxiData = new String[6];
 		
 		try
 		{
@@ -72,15 +72,20 @@ public class ConnectServerAsyncTask extends AsyncTask<Void, Void, String>{
 			output = new DataOutputStream(socket.getOutputStream());
 			
 			//SEND CLIENT ID TO SERVER
-			output.writeUTF(String.valueOf(CLIENTID));
+			output.writeUTF(String.valueOf(CLIENT_ID));
 			
 			//SEND COORDINATES TO SERVER
-			String coordinates = cur.latitude + "," + cur.longitude + "," 
+			String clientData = cur.latitude + "," + cur.longitude + "," 
 								 + dest.latitude + "," + dest.longitude;
-			output.writeUTF(coordinates);
+			output.writeUTF(clientData);
 			
 			//READ SERVER MESSAGE
-			serverMsg = input.readUTF();
+			taxiData[0] = input.readUTF();
+			taxiData[1] = input.readUTF();
+			taxiData[2] = input.readUTF();
+			taxiData[3] = input.readUTF();
+			taxiData[4] = input.readUTF();
+			taxiData[5] = input.readUTF();
 		} 
 		catch (UnknownHostException e) 
 		{
@@ -120,6 +125,6 @@ public class ConnectServerAsyncTask extends AsyncTask<Void, Void, String>{
 				}
 			}
 		}
-		return serverMsg;
+		return taxiData;
 	}
 }

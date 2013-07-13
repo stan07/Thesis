@@ -3,66 +3,59 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical" 
+    android:gravity="center"
     android:background="#000000">
-
+	
     <TextView
+        android:id="@+id/failed"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textSize="16dp"
+        android:textStyle="bold"
+        android:textColor="#ffffff"
+        android:text=""/>
+    
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Plate Number:"
+        android:textColor="#ffffff"
+        android:layout_marginTop="20dp" 
+        android:layout_marginRight="100dp"/>
+    
+    <EditText 
         android:id="@+id/plateno"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:textSize="16dp"
-        android:textStyle="bold"
-        android:textColor="#ffffff"
-        android:text="Plate Number: "
+        android:background="#ffffff"
+        android:width="250dp"
+        android:height="25dp"
         android:layout_marginTop="20dp"/>
     
     <TextView
-        android:id="@+id/bodyno"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:textSize="16dp"
-        android:textStyle="bold"
+        android:text="Driver License:"
         android:textColor="#ffffff"
-        android:text="Body Number: "
+        android:layout_marginTop="40dp" 
+        android:layout_marginRight="100dp"/>
+    
+    <EditText 
+        android:id="@+id/license"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:background="#ffffff"
+        android:width="250dp"
+        android:height="25dp"
         android:layout_marginTop="20dp"/>
     
-    <TextView
-        android:id="@+id/taxicomp"
+    <Button 
+        android:id="@+id/connect"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:textSize="16dp"
-        android:textStyle="bold"
+        android:width="150dp"
+        android:text="CONNECT"
         android:textColor="#ffffff"
-        android:text="Taxi Company: "
-        android:layout_marginTop="20dp"/>
-    
-    <TextView
-        android:id="@+id/taxidesc"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:textSize="16dp"
-        android:textStyle="bold"
-        android:textColor="#ffffff"
-        android:text="Taxi Description: "
-        android:layout_marginTop="20dp"/>
-    
-    <TextView
-        android:id="@+id/drivername"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:textSize="16dp"
-        android:textStyle="bold"
-        android:textColor="#ffffff"
-        android:text="Driver Name: "
-        android:layout_marginTop="20dp"/>
-    
-    <TextView
-        android:id="@+id/driverno"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:textSize="16dp"
-        android:textStyle="bold"
-        android:textColor="#ffffff"
-        android:text="Driver Number: "
-        android:layout_marginTop="20dp"/>
+        android:layout_marginTop="40dp"/>
 
 </LinearLayout>
